@@ -13,10 +13,24 @@ const cors = require('cors')
 
 // console.log("Hello")
 
+const allowedOrigins = [
+  "http://localhost:5173",                 // local dev
+  process.env.FRONTEND_URL                 // your deployed frontend from env
+];
+
+// CORS middleware
 app.use(cors({
-    origin: 'http://localhost:5173',
-    credentials: true 
-}))
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS not allowed for this origin"));
+    }
+  },
+  credentials: true
+}));
+
 
 app.use(express.json());
 app.use(cookieParser());
@@ -29,22 +43,22 @@ app.use("/video",videoRouter);
 
 module.exports = app;
 
-const InitalizeConnection = async ()=>{
-    try{
+// ✅ Local development only
+if (require.main === module) {
+  const InitalizeConnection = async () => {
+    try {
+      await Promise.all([main(), redisClient.connect()]);
+      console.log("DB Connected");
 
-        await Promise.all([main(),redisClient.connect()]);
-        console.log("DB Connected");
-        
-        app.listen(process.env.PORT, ()=>{
-            console.log("Server listening at port number: "+ process.env.PORT);
-        })
+      app.listen(process.env.PORT || 3000, () => {
+        console.log(
+          "Server listening at port number: " + (process.env.PORT || 3000)
+        );
+      });
+    } catch (err) {
+      console.log("Error: " + err);
+    }
+  };
 
-    }
-    catch(err){
-        console.log("Error: "+err);
-    }
+  InitalizeConnection();
 }
-
-
-InitalizeConnection();
-
