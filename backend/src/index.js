@@ -41,7 +41,6 @@ app.use('/submission',submitRouter);
 app.use('/ai',aiRouter);
 app.use("/video",videoRouter);
 
-const app = require("./index");
 module.exports = app;
 
 // ✅ Local development only
