@@ -27,6 +27,7 @@ app.use('/submission',submitRouter);
 app.use('/ai',aiRouter);
 app.use("/video",videoRouter);
 
+module.exports = app;
 
 const InitalizeConnection = async ()=>{
     try{
